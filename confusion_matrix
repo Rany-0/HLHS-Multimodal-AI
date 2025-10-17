@@ -1,0 +1,233 @@
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
+import seaborn as sns
+import pandas as pd
+import matplotlib.pyplot as plt
+train_data = pd.read_csv(r"D:/SFY/imagescore5/imagescore5/prob/pc_rm_ULR.csv")#只用改这个数据输入路径
+train_CLA = train_data['pred_probability']
+Y_train = train_data['label']
+
+# val_data = pd.read_csv(r"C:\Users\Administrator\Desktop\pc\pc_rm.csv")#只用改这个数据输入路径
+# val_CLA = val_data['pred_probability']
+# Y_val = val_data['label']
+
+test_data = pd.read_csv(r"D:/SFY/imagescore5/imagescore5/prob/tc1_rm_ULR.csv")#只用改这个数据输入路径
+test_CLA = test_data['pred_probability']
+Y_test = test_data['label']
+def sensitivity_specificity(Y_true, Y_pred):
+    cm = confusion_matrix(Y_true, Y_pred)
+    TN, FP, FN, TP = cm.ravel()
+    sensitivity = TP / (TP + FN)
+    specificity = TN / (TN + FP)
+    return sensitivity, specificity
+
+def plot_confusion_matrix(Y_true, Y_pred, title):
+    cm = confusion_matrix(Y_true, Y_pred)
+    plt.figure(figsize=(4, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False)
+    plt.title(title)
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.show()
+
+# 选择一个合适的阈值
+chosen_threshold = 0.5
+train_predictions = (train_CLA > chosen_threshold).astype(int)
+test_predictions = (test_CLA > chosen_threshold).astype(int)
+
+# 计算敏感性和特异性
+# train_sensitivity, train_specificity = sensitivity_specificity(Y_train, train_predictions)
+# test_sensitivity, test_specificity = sensitivity_specificity(Y_test, test_predictions)
+
+# # 打印结果
+# print("Train Sensitivity:", train_sensitivity)
+# print("Train Specificity:", train_specificity)
+# print("Test Sensitivity:", test_sensitivity)
+# print("Test Specificity:", test_specificity)
+
+# 绘制训练集和测试集的混淆矩阵
+plot_confusion_matrix(Y_train, train_predictions, "Train Confusion Matrix")
+plot_confusion_matrix(Y_test, test_predictions, "Test Confusion Matrix")
+
+
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score,roc_auc_score
+import seaborn as sns
+import pandas as pd
+import matplotlib.pyplot as plt
+train_data = pd.read_excel(r"E:\SFYdataJPG\小脑\论文\pro0423\inception-vgg16-c+cere-test.xlsx")#只用改这个数据输入路径
+train_CLA = train_data['pred_probability']
+Y_train = train_data['label']
+
+# val_data = pd.read_csv(r"C:\Users\Administrator\Desktop\pc\pc_rm.csv")#只用改这个数据输入路径
+# val_CLA = val_data['pred_probability']
+# Y_val = val_data['label']
+
+test_data = pd.read_excel(r"E:\SFYdataJPG\小脑\论文\pro0423\inception-vgg16-c+cere-test2.xlsx")#只用改这个数据输入路径
+test_CLA = test_data['pred_probability']
+Y_test = test_data['label']
+def sensitivity_specificity(Y_true, Y_pred):
+    cm = confusion_matrix(Y_true, Y_pred)
+    TN, FP, FN, TP = cm.ravel()    #这里的TP表示负例被预测为负TN，TN表示TP，FN表示FP,
+    # print(FN)
+     
+    sensitivity = TP / (TP + FN)#有病的里面检测有病的概率-检测出确实有病的能力
+    specificity = TN / (TN + FP)#检测出确实没病的能力
+    TPR=TP / (TP + FN)
+    FPR=FP/(FP+TN)
+    return sensitivity, specificity,TPR,FPR
+
+def plot_confusion_matrix(Y_true, Y_pred, title):
+    cm = confusion_matrix(Y_true, Y_pred)
+    plt.figure(figsize=(4, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False)
+    plt.title(title)
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.show()
+
+# 选择一个合适的阈值
+chosen_threshold = 0.5
+train_predictions = (train_CLA > chosen_threshold).astype(int)
+test_predictions = (test_CLA > chosen_threshold).astype(int)
+
+# 计算敏感性和特异性
+train_sensitivity, train_specificity,train_tpr, train_fpr = sensitivity_specificity(Y_train, train_predictions)
+test_sensitivity, test_specificity,test_tpr, test_fpr = sensitivity_specificity(Y_test, test_predictions)
+# 计算准确性
+train_accuracy = accuracy_score(Y_train, train_predictions)
+test_accuracy = accuracy_score(Y_test, test_predictions)
+
+# 计算AUC
+train_auc = roc_auc_score(Y_train, train_CLA)
+test_auc = roc_auc_score(Y_test, test_CLA)
+
+# 计算F1分数
+train_f1 = f1_score(Y_train, train_predictions)
+test_f1 = f1_score(Y_test, test_predictions)
+# 打印结果
+# 打印结果
+print("Train Accuracy:", train_accuracy)
+print("Train AUC:", train_auc)
+print("Train F1 Score:", train_f1)
+print("Train Sensitivity:", train_sensitivity)
+print("Train Specificity:", train_specificity)
+print("Train TPR:", train_tpr)
+print("Train FPR:", train_fpr)
+
+
+print("\nTest Accuracy:", test_accuracy)
+print("Test AUC:", test_auc)
+print("Test F1 Score:", test_f1)
+print("Test Sensitivity:", test_sensitivity)
+print("Test Specificity:", test_specificity)
+print("Test TPR:", test_tpr)
+print("Test FPR:", test_fpr)
+
+# 绘制训练集和测试集的混淆矩阵
+plot_confusion_matrix(Y_train, train_predictions, "Train Confusion Matrix")
+plot_confusion_matrix(Y_test, test_predictions, "Test Confusion Matrix")
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, roc_auc_score, roc_curve
+
+# 读取数据 0表示正例，1表示负例!!!!
+train_data = pd.read_csv(r"D:\wxx\SFYdataJPG\Code\imagescore5\imagescore5\ML\0728-3feature\tc_svm.csv")
+train_CLA = train_data['pred_probability']
+Y_train = train_data['label']
+
+test_data = pd.read_csv(r"D:\wxx\SFYdataJPG\Code\imagescore5\imagescore5\ML\0728-3feature\tc_xgb.csv")
+test_CLA = test_data['pred_probability']
+Y_test = test_data['label']
+
+def sensitivity_specificity(Y_true, Y_pred):
+    cm = confusion_matrix(Y_true, Y_pred)
+    print("Confusion Matrix:\n", cm)
+    TN, FP, FN, TP = cm.ravel()
+    
+    sensitivity = TN / (TN + FP) if (TN + FP) > 0 else 0  # TN作为正例的灵敏度
+    specificity = TP / (TP + FN) if (TP + FN) > 0 else 0  # TP作为负例的特异性
+    TPR = TN / (TN + FP) if (TN + FP) > 0 else 0          # 正确识别正例的比例
+    FPR = FP / (FP + TN) if (FP + TN) > 0 else 0          # 错误识别正例的比例
+    PPV = TN / (TN + FN) if (TN + FN) > 0 else 0          # 预测为正例的实际正例比例
+    NPV = TP / (TP + FP) if (TP + FP) > 0 else 0          # 预测为负例的实际负例比例
+    
+    return sensitivity, specificity, TPR, FPR, PPV, NPV
+
+def plot_confusion_matrix(Y_true, Y_pred, title):
+    cm = confusion_matrix(Y_true, Y_pred)
+    print(cm)
+    plt.figure(figsize=(5, 6))  # 调整图表大小
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False, annot_kws={"size": 16})  # 调整字体大小
+    plt.title(title, fontsize=18)  # 调整标题字体大小
+    plt.xlabel("Predicted", fontsize=14)  # 调整标签字体大小
+    plt.ylabel("Actual", fontsize=14)  # 调整标签字体大小
+    plt.xticks(fontsize=12)  # 调整x轴标签字体大小
+    plt.yticks(fontsize=12)  # 调整y轴标签字体大小
+    plt.tight_layout()  # 确保布局紧凑，不会重叠
+    plt.show()
+
+# 计算最佳阈值
+def find_best_threshold(y_true, y_prob):
+    fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+    youdens_j = tpr - fpr
+    best_threshold = thresholds[np.argmax(youdens_j)]
+    return best_threshold
+
+# 找到最佳阈值
+best_threshold_train = find_best_threshold(Y_train, train_CLA)
+best_threshold_test = find_best_threshold(Y_test, test_CLA)
+print("Best Threshold for Train:", best_threshold_train)
+print("Best Threshold for Test:", best_threshold_test)
+
+# 使用最佳阈值进行预测
+# train_predictions = (train_CLA > best_threshold_train).astype(int)
+# test_predictions = (test_CLA > best_threshold_test).astype(int)
+
+# 使用最佳阈值进行预测
+train_predictions = (train_CLA > 0.5).astype(int)
+test_predictions = (test_CLA > 0.5).astype(int)
+
+# 计算敏感性、特异性、TPR、FPR、PPV、NPV
+train_sensitivity, train_specificity, train_tpr, train_fpr, train_ppv, train_npv = sensitivity_specificity(Y_train, train_predictions)
+test_sensitivity, test_specificity, test_tpr, test_fpr, test_ppv, test_npv = sensitivity_specificity(Y_test, test_predictions)
+
+# 计算准确性
+train_accuracy = accuracy_score(Y_train, train_predictions)
+test_accuracy = accuracy_score(Y_test, test_predictions)
+
+# 计算AUC
+train_auc = roc_auc_score(Y_train, train_CLA)
+test_auc = roc_auc_score(Y_test, test_CLA)
+
+# 计算F1分数
+train_f1 = f1_score(Y_train, train_predictions, pos_label=0)
+test_f1 = f1_score(Y_test, test_predictions, pos_label=0)
+
+# 打印结果
+print("Train Accuracy:", train_accuracy)
+print("Train AUC:", train_auc)
+print("Train F1 Score:", train_f1)
+print("Train Sensitivity:", train_sensitivity)
+print("Train Specificity:", train_specificity)
+print("Train TPR:", train_tpr)
+print("Train FPR:", train_fpr)
+print("Train PPV:", train_ppv)
+print("Train NPV:", train_npv)
+
+print("\nTest Accuracy:", test_accuracy)
+print("Test AUC:", test_auc)
+print("Test F1 Score:", test_f1)
+print("Test Sensitivity:", test_sensitivity)
+print("Test Specificity:", test_specificity)
+print("Test TPR:", test_tpr)
+print("Test FPR:", test_fpr)
+print("Test PPV:", test_ppv)
+print("Test NPV:", test_npv)
+
+# 绘制训练集和测试集的混淆矩阵
+plot_confusion_matrix(Y_train, train_predictions, "Train Confusion Matrix")
+plot_confusion_matrix(Y_test, test_predictions, "Test Confusion Matrix")
+
+
